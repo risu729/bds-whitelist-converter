@@ -19,6 +19,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -60,7 +61,7 @@ final class Main {
         allowlist = allowlist.stream().map(player -> {
           if (player.xuid() == null) {
             System.out.printf("Enter XUID for %s:%n", player.name());
-            return new Player(player.ignoresPlayerLimit(), player.name(), scanner.nextLine());
+            return new Player(player.name(), scanner.nextLine(), player.ignoresPlayerLimit());
           } else {
             return player;
           }
@@ -75,14 +76,25 @@ final class Main {
         gson.toJson(allowlist.stream()
             .map(Player::xuid)
             .peek(Objects::requireNonNull)
-            .map(xuid -> new Permission("operator", xuid))
+            .map(xuid -> new Permission(PermissionLevel.OPERATOR, xuid))
             .toList()));
     System.out.printf("Exported %s%n", PERMISSIONS.getFileName());
 
     System.out.println("Done!");
   }
 
-  private record Player(boolean ignoresPlayerLimit, @NotNull String name, @Nullable String xuid) {}
+  private enum PermissionLevel {
+    VISITOR,
+    MEMBER,
+    OPERATOR;
 
-  private record Permission(@NotNull String permission, @NotNull String xuid) {}
+    @Override
+    public @NotNull String toString() {
+      return name().toLowerCase(Locale.ENGLISH);
+    }
+  }
+
+  private record Player(@NotNull String name, @Nullable String xuid, boolean ignoresPlayerLimit) {}
+
+  private record Permission(@NotNull PermissionLevel permission, @NotNull String xuid) {}
 }
