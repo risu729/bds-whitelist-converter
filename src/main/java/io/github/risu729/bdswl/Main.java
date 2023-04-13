@@ -60,7 +60,7 @@ final class Main {
       try (var scanner = new Scanner(System.in)) {
         allowlist = allowlist.stream().map(player -> {
           if (player.xuid() == null) {
-            System.out.printf("Enter XUID for %s:%n", player.name());
+            System.out.printf("Enter XUID(DEC) for %s:%n", player.name());
             return new Player(player.name(), scanner.nextLine(), player.ignoresPlayerLimit());
           } else {
             return player;
